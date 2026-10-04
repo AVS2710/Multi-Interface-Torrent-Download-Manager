@@ -100,10 +100,12 @@ export class NetworkManager {
 
   public async getHealthyInterfaces(): Promise<NetworkInterfaceInfo[]> {
     const all = this.getInterfaces();
-    for (const iface of all) {
+    // ⚡ Bolt: Execute health checks concurrently using Promise.all to prevent sequential timeout delays across multiple interfaces.
+    // This reduces the total time from O(n * timeout) to O(timeout) worst-case.
+    await Promise.all(all.map(async (iface) => {
       iface.state = await this.healthChecker.check(iface.ipv4Addresses[0]);
       iface.hasInternet = iface.state === 'CONNECTED';
-    }
+    }));
     return all;
   }
 }
