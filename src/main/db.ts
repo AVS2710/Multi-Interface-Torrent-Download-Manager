@@ -53,7 +53,7 @@ export async function getSelectedNetworks(): Promise<SelectedNetwork[]> {
   return rows.map(row => ({
     interfaceId: row.interfaceName,
     enabled: Boolean(row.enabled),
-    priority: row.priority as any || "normal",
+    priority: (row.priority as "high" | "normal" | "low") || "normal",
     metered: Boolean(row.metered)
   }));
 }

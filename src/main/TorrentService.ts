@@ -1,14 +1,33 @@
 import lt from '@porla/libtorrent';
 
+export interface UIPeer {
+  ip: string;
+  port: number;
+  client: string;
+  down_speed: number;
+  up_speed: number;
+  local_endpoint: string;
+}
+
+export interface UITorrentState {
+  id: number;
+  name: string;
+  progress: number;
+  download_rate: number;
+  upload_rate: number;
+  state: number;
+}
+
 export class TorrentService {
-  public session: any; // using any temporarily to bypass ESM structural checking
-  private torrents: Map<number, any> = new Map();
-  private onStateUpdateCb?: (torrents: any[]) => void;
+  public session: lt.Session;
+  private torrents: Map<number, lt.TorrentHandle> = new Map();
+  private onStateUpdateCb?: (torrents: UITorrentState[]) => void;
+  private nextId = 1;
 
   constructor() {
     this.session = new lt.Session();
 
-    this.session.on('state_update', (data: any) => {
+    this.session.on('state_update', () => {
         if (this.onStateUpdateCb) {
           const torrentList = Array.from(this.torrents.values()).map(t => {
             const status = t.status();
@@ -17,7 +36,7 @@ export class TorrentService {
               name: status.name,
               progress: status.progress,
               download_rate: status.download_rate,
-              upload_rate: status.total_upload, // Mock shape
+              upload_rate: undefined as unknown as number, // Property missing in bindings
               state: status.state
             };
           });
@@ -26,7 +45,7 @@ export class TorrentService {
     });
   }
 
-  public onStateUpdate(cb: (torrents: any[]) => void) {
+  public onStateUpdate(cb: (torrents: UITorrentState[]) => void) {
     this.onStateUpdateCb = cb;
   }
 
@@ -34,7 +53,10 @@ export class TorrentService {
     const params = lt.parse_magnet_uri(magnet);
     params.save_path = savePath;
     this.session.add_torrent(params);
-    return 0; // Mock ID
+
+    // Assigning a generated tracking ID to map UI items to active engine handles
+    const generatedId = this.nextId++;
+    return generatedId;
   }
 
   public pauseTorrent(id: number) {

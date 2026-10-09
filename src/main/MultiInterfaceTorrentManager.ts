@@ -21,14 +21,14 @@ export class MultiInterfaceTorrentManager {
       let interfaces: import('./networkManager.js').NetworkInterfaceInfo[] = [];
       try {
         interfaces = await networkManager.getHealthyInterfaces();
-      } catch (err) {
+      } catch {
         // Safe handling if network detection completely fails
       }
 
       let selected: SelectedNetwork[] = [];
       try {
         selected = await getSelectedNetworks();
-      } catch (e) {
+      } catch {
         // Safe handling if DB not ready
       }
 
@@ -54,7 +54,7 @@ export class MultiInterfaceTorrentManager {
             listen_interfaces: listenString
           });
           this.currentOutgoingInterfaces = joinedString;
-        } catch (e) {
+        } catch {
           // Fallback handling if libtorrent rejects configuration
         }
       }

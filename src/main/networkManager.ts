@@ -23,7 +23,7 @@ export class InterfaceHealthChecker {
     try {
       const isOnline = await this.checkConnectivity(ipv4);
       return isOnline ? 'CONNECTED' : 'NO_INTERNET';
-    } catch (e) {
+    } catch {
       return 'ERROR';
     }
   }
@@ -54,7 +54,7 @@ export class InterfaceHealthChecker {
           host: '8.8.8.8',
           localAddress: interfaceIp
         });
-      } catch (e) {
+      } catch {
         resolve(false);
       }
     });

@@ -1,2 +1,8 @@
 test-libtorrent/
 node_modules/
+dist/
+dist-electron/
+release/
+playwright-report/
+test-results/
+.last-run.json

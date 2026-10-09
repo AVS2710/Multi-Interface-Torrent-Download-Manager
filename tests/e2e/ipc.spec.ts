@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import * as path from 'path';
-import { _electron as electron } from 'playwright';
+// import * as path from 'path';
+// import { _electron as electron } from 'playwright';
 
 test.describe('Electron IPC and Preload Bridge', () => {
   test('renderer can invoke getNetworks strictly through preload bridge', async () => {
