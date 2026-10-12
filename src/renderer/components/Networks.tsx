@@ -11,6 +11,8 @@ interface Network {
   enabled: boolean;
   priority: string;
   metered: boolean;
+  downloadLimit?: number;
+  uploadLimit?: number;
 }
 
 const Networks: React.FC = () => {
@@ -28,6 +30,15 @@ const Networks: React.FC = () => {
     if (torrentApi) {
       torrentApi.updateNetworkPreferences(id, { enabled: !current }).then(() => {
         setNetworks(prev => prev.map(n => n.id === id ? { ...n, enabled: !current } : n));
+      });
+    }
+  };
+
+  const updateLimit = (id: string, field: 'downloadLimit' | 'uploadLimit', value: string) => {
+    const numValue = value === '' ? undefined : parseInt(value, 10);
+    if (torrentApi) {
+      torrentApi.updateNetworkPreferences(id, { [field]: numValue }).then(() => {
+        setNetworks(prev => prev.map(n => n.id === id ? { ...n, [field]: numValue } : n));
       });
     }
   };
@@ -86,11 +97,23 @@ const Networks: React.FC = () => {
                 <div className="pt-2 border-t mt-2 border-gray-200 dark:border-gray-700">
                   <div className="flex flex-col mb-1 text-sm">
                      <label className="text-gray-600 dark:text-gray-400 mb-1">Download Limit (KB/s)</label>
-                     <input type="number" placeholder="0 (Unlimited)" className="p-1 text-sm border rounded bg-white dark:bg-gray-700 w-32" />
+                     <input
+                       type="number"
+                       placeholder="0 (Unlimited)"
+                       className="p-1 text-sm border rounded bg-white dark:bg-gray-700 w-32"
+                       value={n.downloadLimit || ''}
+                       onChange={(e) => updateLimit(n.id, 'downloadLimit', e.target.value)}
+                     />
                   </div>
                   <div className="flex flex-col text-sm">
                      <label className="text-gray-600 dark:text-gray-400 mb-1">Upload Limit (KB/s)</label>
-                     <input type="number" placeholder="0 (Unlimited)" className="p-1 text-sm border rounded bg-white dark:bg-gray-700 w-32" />
+                     <input
+                       type="number"
+                       placeholder="0 (Unlimited)"
+                       className="p-1 text-sm border rounded bg-white dark:bg-gray-700 w-32"
+                       value={n.uploadLimit || ''}
+                       onChange={(e) => updateLimit(n.id, 'uploadLimit', e.target.value)}
+                     />
                   </div>
                 </div>
               </div>
